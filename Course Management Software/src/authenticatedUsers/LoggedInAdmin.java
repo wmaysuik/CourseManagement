@@ -1,5 +1,6 @@
 package authenticatedUsers;
 
+import SystemState.System_State;
 import authenticationServer.AuthenticationToken;
 
 public class LoggedInAdmin implements LoggedInAuthenticatedUser {
@@ -47,5 +48,22 @@ public class LoggedInAdmin implements LoggedInAuthenticatedUser {
 	public void setAuthenticationToken(AuthenticationToken authenticationToken) {
 		this.authenticationToken = authenticationToken;
 	}
+	
+	public void StartSystem() {
+		if(System_State.state == 1) {
+			System.out.println("System is already in a started state");
+			return;
+		}
+		System_State.state = 1;
+		System.out.println("System has been started");
+	}
+	
+	public void StopSystem() {
+		//Put if statement here if it is 0
+		System_State.state = 0;
+		System.out.println("System stoppage, you have been logged out and no operations can be performed until started again");
+	}
+	
+	
 	 
 }

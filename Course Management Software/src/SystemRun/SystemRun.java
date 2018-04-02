@@ -6,45 +6,50 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import SystemState.System_State;
 import authenticationServer.AuthenticationToken;
 import loggedInUserFactory.LoggedInUserFactory;
 import authenticatedUsers.LoggedInAuthenticatedUser;
+import authenticatedUsers.LoggedInInstructor;
+import authenticatedUsers.LoggedInStudent;
+import authenticatedUsers.LoggedInAdmin;
 
 public class SystemRun {
 	
 	public static void main(String args[]) {
 		checkLogin();	//Make sure that the user presses L to log in 
+		while(System_State.state == 1) {
+			String [] userInfo = logInUser(); //Log the user in 
+			AuthenticationToken token = new AuthenticationToken(userInfo[3]);
+			LoggedInUserFactory factory = new LoggedInUserFactory();
+			LoggedInAuthenticatedUser user = factory.createAuthenticatedUser(token);
+			user.setName(userInfo[0]);
+			user.setSurname(userInfo[1]);
+			user.setID(userInfo[2]);
+			//Here I want to print a text file to the console, if not then i wil make a string notifying what operations they can do as this role
+			if(user.getID().charAt(0) == '0') {
+				printOp("AuthAdminOperations.txt");
+				LoggedInAdmin authenticatedAdmin = (LoggedInAdmin) user;
+				adminOperations(authenticatedAdmin); //function which perform the admin operations 
+			}
+			else if(user.getID().charAt(0) == '1') {
+				printOp("AuthInsturctorOperations.txt");
+				LoggedInInstructor authenticatedInstructor = (LoggedInInstructor) user;
+				break;
+				//use instructor operations
+			}
+			else if(user.getID().charAt(0) == ('2')) {
+				printOp("AuthStudentOperations.txt");
+				LoggedInStudent authenticatedStudent = (LoggedInStudent) user;
+				break;
+				//use student operations 
+			}
+			else 
+				System.out.println("Error"); //change this to an error text file 
+		}
 		
-		String [] userInfo = logInUser(); //Log the user in 
-		AuthenticationToken token = new AuthenticationToken(userInfo[3]);
-		LoggedInUserFactory factory = new LoggedInUserFactory();
-		LoggedInAuthenticatedUser user = factory.createAuthenticatedUser(token);
-		//Here I want to print a text file to the console, if not then i wil make a string notifying what operations they can do as this role
-		if(user.getAuthenticationToken().getUserType().equals("Admin"))
-			printOp("AuthAdminOperations.txt");
-		else if(user.getAuthenticationToken().getUserType().equals("Instructor"))
-			printOp("AuthInsturctorOperations.txt");
-		else if(user.getAuthenticationToken().getUserType().equals("Student"))
-			printOp("AuthStudentOperations.txt");
-		else
-			System.out.println("Error"); //change this to an error text file 
-		
+		exitMessage();
 	}
-	
-		
-		
-		
-		
-		
-		
-		
-		
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -64,15 +69,21 @@ public class SystemRun {
 	               System.out.println("Enter ID: ");
 	               input = br.readLine();
 	               info[2] = input;
-	               System.out.println("Enter position (Student, Admin, Instructor): ");
-	               input = br.readLine();
-	               info[3] = input;
-	               br.close();
+	               
+	            switch(info[2].charAt(0)) {
+		       		case '0':
+		       			info[3] = "Admin";
+		       			break;
+		       		case '1':
+		       			info[3] = "Instructor";
+		       			break;
+		       		case '2': 
+		       			info[3] = "Student";
+		       			break;
+	       		}
 	              
-	           
 	       } catch (IOException e) {
 	           e.printStackTrace();
-	       
 	       }
 	       return info;
 	}
@@ -104,6 +115,43 @@ public class SystemRun {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private static void adminOperations(LoggedInAdmin user) {
+		boolean login = true;
+		while(login && System_State.state == 1) {
+			BufferedReader br = null; 	
+			try {
+				 br = new BufferedReader(new InputStreamReader(System.in));
+				 String input = br.readLine();
+				 switch(input) {
+				 case "1":
+					 user.StartSystem();
+					 break;
+				 
+				 case "2": //put a print statement at the end of the main function, once 
+					 user.StopSystem();
+					 break;
+					 
+				 //case "3": this is the case where it performs the operations I will want it to perform, do this April 03
+				 case "Logout":
+					 login = false;
+					 System.out.println("You have been logged out");
+					 break;
+				 }	
+			}
+			catch (IOException e) {
+		           e.printStackTrace();
+		       }
+			
+		}
+	}
+	
+	private static void exitMessage() { //writes an exit method, given how it reaches the end of the 
+		if(System_State.state == 0)
+			System.out.println("Session terminated");
+		else
+			System.out.println("You have successfully logged out");
 	}
 	
 	
