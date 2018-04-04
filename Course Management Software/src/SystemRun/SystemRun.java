@@ -20,10 +20,6 @@ public class SystemRun {
 		checkLogin();	//Make sure that the user presses L to log in
 		while(System_State.state == 1) {
 			String [] userInfo = logInUser(); //Log the user in 
-			if(userInfo[3].equals("invalid")) {
-				System.out.println("Invalid ID");
-				break;
-			}
 			AuthenticationToken token = new AuthenticationToken(userInfo[3]);
 			LoggedInUserFactory factory = new LoggedInUserFactory();
 			LoggedInAuthenticatedUser user = factory.createAuthenticatedUser(token);
@@ -62,7 +58,7 @@ public class SystemRun {
 		 BufferedReader br = null;
 	
 	       try {
-	
+	    	   	   boolean ID = false;
 	           br = new BufferedReader(new InputStreamReader(System.in));
 	           	System.out.println("Enter first name: ");
 	               String input = br.readLine();
@@ -70,10 +66,17 @@ public class SystemRun {
 	               System.out.println("Enter last name: ");
 	               input = br.readLine();
 	               info[1] = input;
-	               System.out.println("Enter ID: ");
-	               input = br.readLine();
-	               info[2] = input;
-	               
+	              
+	               while(!ID) {
+		               System.out.println("ID's beggining with 0: Admin, 1:Instructor, 2:Student \nEnter ID: ");
+		               input = br.readLine();
+		               if(input.charAt(0) ==  '0' || input.charAt(0) == '1' || input.charAt(0) == '2') {
+		            	   		info[2] = input;
+		            	   		ID = true;
+		               }
+		               else
+		            	   		System.out.println("Wrong ID, please try again");
+	               }     
 	            switch(info[2].charAt(0)) {
 		       		case '0':
 		       			info[3] = "Admin";
@@ -83,9 +86,6 @@ public class SystemRun {
 		       			break;
 		       		case '2': 
 		       			info[3] = "Student";
-		       			break;
-		       		default: 
-		       			info[3] = "invalid";
 		       			break;
 	       		}
 	              
