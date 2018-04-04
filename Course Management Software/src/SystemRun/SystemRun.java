@@ -17,9 +17,13 @@ import authenticatedUsers.LoggedInAdmin;
 public class SystemRun {
 	
 	public static void main(String args[]) {
-		checkLogin();	//Make sure that the user presses L to log in 
+		checkLogin();	//Make sure that the user presses L to log in
 		while(System_State.state == 1) {
 			String [] userInfo = logInUser(); //Log the user in 
+			if(userInfo[3].equals("invalid")) {
+				System.out.println("Invalid ID");
+				break;
+			}
 			AuthenticationToken token = new AuthenticationToken(userInfo[3]);
 			LoggedInUserFactory factory = new LoggedInUserFactory();
 			LoggedInAuthenticatedUser user = factory.createAuthenticatedUser(token);
@@ -80,6 +84,9 @@ public class SystemRun {
 		       		case '2': 
 		       			info[3] = "Student";
 		       			break;
+		       		default: 
+		       			info[3] = "invalid";
+		       			break;
 	       		}
 	              
 	       } catch (IOException e) {
@@ -119,7 +126,7 @@ public class SystemRun {
 	
 	private static void adminOperations(LoggedInAdmin user) {
 		boolean login = true;
-		while(login && System_State.state == 1) {
+		while(login && System_State.state == 1) { //while the user is logged in, and the system is in a running state, they are able to pe
 			BufferedReader br = null; 	
 			try {
 				 br = new BufferedReader(new InputStreamReader(System.in));
@@ -133,10 +140,16 @@ public class SystemRun {
 					 user.StopSystem();
 					 break;
 					 
-				 //case "3": this is the case where it performs the operations I will want it to perform, do this April 03
+				 case "3": 
+					 user.readCourseFiles();
+					 System.out.println("Course file updated");
+					 break;
 				 case "Logout":
 					 login = false;
 					 System.out.println("You have been logged out");
+					 break;
+				 default: 
+					 System.out.println("Invalid key entry, please try again");
 					 break;
 				 }	
 			}
@@ -151,7 +164,7 @@ public class SystemRun {
 		if(System_State.state == 0)
 			System.out.println("Session terminated");
 		else
-			System.out.println("You have successfully logged out");
+			System.out.println("Logged out");
 	}
 	
 	
