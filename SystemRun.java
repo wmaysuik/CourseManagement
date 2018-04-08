@@ -179,20 +179,21 @@ public class SystemRun {
 				 String input = br.readLine();
 				 switch(input) {
 				 case "1":
-					 System.out.println("Enter the course ID of the course you want to enroll in?");
+					 boolean enrolled = false;
+					 System.out.println("Enter the course ID of the course you want to enroll in");
 					 String option = br.readLine();
 					 if (!student.getCoursesAllowed().isEmpty()) {
 						 for (ICourseOffering course : student.getCoursesAllowed()) {
 							 if (course.getCourseID().equals(option)) {
-								 if(student.enroll((CourseOffering) course))
+								 if(student.enroll((CourseOffering) course)) {
 									 System.out.print("Enrollment successful!");
-								 else
-									 System.out.println("Erollment failed. You are not allowed to take that course.");
-								 break;
+									 enrolled = true;
+								 }
 							 }
 						 }
 					 }
-					 System.out.println("You are not allowed to enroll in that course.");
+					 if (!enrolled)
+						 System.out.println("You are not allowed to enroll in that course.");
 					 break;
 				 
 				 case "2":

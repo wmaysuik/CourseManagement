@@ -1,5 +1,6 @@
 package systemUsers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -99,6 +100,8 @@ public class StudentModel implements IStudentModel{
 	public boolean enroll(CourseOffering course) {
 		List<StudentModel> enrolledStudents = course.getStudentsEnrolled();
 		if(checkIfStudentCanTakeCourse(course)) {
+			if (coursesEnrolled == null)
+				coursesEnrolled = new ArrayList<>();
 			enrolledStudents.add(this);
 			coursesEnrolled.add(course);
 			return true;
