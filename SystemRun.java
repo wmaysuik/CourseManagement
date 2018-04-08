@@ -11,6 +11,7 @@ import authenticationServer.AuthenticationToken;
 import loggedInUserFactory.LoggedInUserFactory;
 import offerings.CourseOffering;
 import offerings.ICourseOffering;
+import registrar.ModelRegister;
 import systemUsers.StudentModel;
 import authenticatedUsers.LoggedInAuthenticatedUser;
 import authenticatedUsers.LoggedInInstructor;
@@ -29,7 +30,7 @@ public class SystemRun {
 			user.setName(userInfo[0]);
 			user.setSurname(userInfo[1]);
 			user.setID(userInfo[2]);
-			//Here I want to print a text file to the console, if not then i wil make a string notifying what operations they can do as this role
+			//Here I want to print a text file to the console, if not then i will make a string notifying what operations they can do as this role
 			if(user.getID().charAt(0) == '0') {
 				printOp("AuthAdminOperations.txt");
 				LoggedInAdmin authenticatedAdmin = (LoggedInAdmin) user;
@@ -44,6 +45,7 @@ public class SystemRun {
 			else if(user.getID().charAt(0) == ('2')) {
 				printOp("AuthStudentOperations.txt");
 				LoggedInStudent authenticatedStudent = (LoggedInStudent) user;
+				studentOperations(authenticatedStudent);
 				break;
 				//use student operations 
 			}
@@ -163,8 +165,13 @@ public class SystemRun {
 		}
 	}
 	
-	private static void studentOperations(StudentModel user) {
+	private static void studentOperations(LoggedInStudent user) {
 		boolean login = true;
+		StudentModel student = (StudentModel) ModelRegister.getInstance().getRegisteredUser(user.getID());
+		if (student == null) {
+			System.out.println("That ID is not valid");
+			return;
+		}
 		while(login && System_State.state == 1) { //while the user is logged in, and the system is in a running state, they are able to pe
 			BufferedReader br = null; 	
 			try {
@@ -174,13 +181,15 @@ public class SystemRun {
 				 case "1":
 					 System.out.println("Enter the course ID of the course you want to enroll in?");
 					 String option = br.readLine();
-					 for (ICourseOffering course : user.getCoursesAllowed()) {
-						 if (course.getCourseID().equals(option)) {
-							 if(user.enroll((CourseOffering) course))
-								 System.out.print("Enrollment successful!");
-							 else
-								 System.out.println("Erollment failed. You are not allowed to take that course.");
-							 break;
+					 if (!student.getCoursesAllowed().isEmpty()) {
+						 for (ICourseOffering course : student.getCoursesAllowed()) {
+							 if (course.getCourseID().equals(option)) {
+								 if(student.enroll((CourseOffering) course))
+									 System.out.print("Enrollment successful!");
+								 else
+									 System.out.println("Erollment failed. You are not allowed to take that course.");
+								 break;
+							 }
 						 }
 					 }
 					 System.out.println("You are not allowed to enroll in that course.");
@@ -190,8 +199,13 @@ public class SystemRun {
 					 System.out.println("1 = Notifications on");
 					 System.out.println("0 = Notifications off");
 					 int notificationStatus = Integer.parseInt(br.readLine());
-					 if (notificationStatus == 0 || notificationStatus == 1)
-						 user.setNotificationStatus(notificationStatus);
+					 if (notificationStatus == 0 || notificationStatus == 1) {
+						 student.setNotificationStatus(notificationStatus);
+						 if (notificationStatus == 0)
+							 System.out.println("Notifications turned off");
+						 else
+							 System.out.println("Notifications turned on");
+					 }
 					 else
 						 System.out.println("That is not a valid option");
 					 break;
